@@ -36,5 +36,24 @@ namespace RestAPITest
             Assert.AreEqual("29000", data.Salary);
             Console.WriteLine(response.Content);
         }
+        [Test]
+        public void addMultipleEmpData_ShouldAddtoJSONServer()
+        {
+            restClient = new RestClient("http://localhost:3000");
+            List<Employee> list = new List<Employee>();
+            list.Add(new Employee { Id = 8, Name = "Om", Salary = "21000" });
+            list.Add(new Employee { Id = 9, Name = "Mohan", Salary = "22000" });
+            list.ForEach(body =>
+            {
+                RestRequest request = new RestRequest("/employees", Method.Post);
+                request.AddParameter("application/json", body, ParameterType.RequestBody);
+                RestResponse response = restClient.Execute(request);
+                Assert.AreEqual(response.StatusCode, HttpStatusCode.Created);
+                Employee data = JsonConvert.DeserializeObject<Employee>(response.Content);
+                Assert.AreEqual(body.Name, data.Name);
+                Assert.AreEqual(body.Salary, data.Salary);
+                Console.WriteLine(response.Content);
+            });
+        }
     }
 }
